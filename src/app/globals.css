@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 170 46% 8%;
+    --foreground: 0 0% 100%;
+    --card: 170 40% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 170 40% 9%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 168 96% 79%;
+    --primary-foreground: 170 46% 8%;
+    --secondary: 170 35% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 170 30% 18%;
+    --muted-foreground: 170 15% 65%;
+    --accent: 168 96% 79%;
+    --accent-foreground: 170 46% 8%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 170 30% 22%;
+    --input: 170 30% 20%;
+    --ring: 168 96% 79%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-hl-bg text-hl-text antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0A1F1C;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1E4540;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #255550;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* HyperJournal Card */
+  .hl-card {
+    @apply bg-hl-bg-card border border-hl-border rounded-lg shadow-card;
+    background-image: var(--tw-gradient-stops, var(--gradient-card-glow, none));
+  }
+
+  .hl-card:hover {
+    @apply border-hl-border-2 shadow-card-hover;
+    transition: all 0.2s ease;
+  }
+
+  /* Stat numbers */
+  .stat-value {
+    @apply font-mono text-2xl font-semibold tracking-tight;
+  }
+
+  .stat-value-lg {
+    @apply font-mono text-3xl font-bold tracking-tight;
+  }
+
+  /* Positive/Negative values */
+  .pnl-positive {
+    @apply text-hl-green;
+  }
+
+  .pnl-negative {
+    @apply text-hl-red;
+  }
+
+  /* Neon glow on primary accent */
+  .hl-glow {
+    @apply text-hl-primary;
+    text-shadow: 0 0 10px rgba(151, 252, 228, 0.5);
+  }
+
+  /* Badge */
+  .hl-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply bg-hl-border/50 animate-pulse rounded;
+  }
+
+  /* Focus ring in HL style */
+  .hl-focus {
+    @apply outline-none ring-2 ring-hl-primary/50 ring-offset-2 ring-offset-hl-bg;
+  }
+
+  /* Voice pulse animation */
+  .voice-pulse::before,
+  .voice-pulse::after {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    background: rgba(151, 252, 228, 0.3);
+    animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+
+  .voice-pulse::after {
+    animation-delay: 0.75s;
+  }
+
+  /* Listening wave bars */
+  .listening-bar {
+    @apply inline-block w-1 bg-hl-primary rounded-full;
+    animation: listening-wave 0.8s ease-in-out infinite;
+  }
+
+  .listening-bar:nth-child(2) { animation-delay: 0.1s; }
+  .listening-bar:nth-child(3) { animation-delay: 0.2s; }
+  .listening-bar:nth-child(4) { animation-delay: 0.3s; }
+  .listening-bar:nth-child(5) { animation-delay: 0.4s; }
+
+  /* Gradient text */
+  .hl-gradient-text {
+    background: linear-gradient(135deg, #97FCE4 0%, #50E3C2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Table styles */
+  .hl-table th {
+    @apply text-xs uppercase tracking-wider text-hl-text-muted font-medium py-3 px-4;
+  }
+
+  .hl-table td {
+    @apply py-3 px-4 text-sm;
+  }
+
+  .hl-table tr {
+    @apply border-b border-hl-border/50 transition-colors;
+  }
+
+  .hl-table tr:hover {
+    @apply bg-hl-bg-hover;
+  }
+}
+
+/* Recharts overrides */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(30, 69, 64, 0.5) !important;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: #0D2420 !important;
+  border: 1px solid #1E4540 !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+}
+
+/* TradingView chart override */
+.tv-chart-container {
+  border-radius: 8px;
+  overflow: hidden;
+}
