@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     .eq("id", user.id)
     .single();
 
-  const profile = profileData as Profile;
+  const profile = profileData as unknown as Profile;
 
   // Fetch recent trades since last coaching session
   let tradesQuery = supabase

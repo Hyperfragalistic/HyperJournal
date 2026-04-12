@@ -62,7 +62,7 @@ export function useTrade(tradeId: string) {
         .eq("id", tradeId)
         .single();
       if (error) throw error;
-      return data as Trade;
+      return data as unknown as Trade;
     },
     enabled: !!userId && !!tradeId,
   });
