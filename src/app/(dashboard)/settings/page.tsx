@@ -83,7 +83,7 @@ export default function SettingsPage() {
 
     const { data, error } = await supabase
       .from("profiles")
-      .update(updates)
+      .update(updates as any)
       .eq("id", profile!.id)
       .select()
       .single();

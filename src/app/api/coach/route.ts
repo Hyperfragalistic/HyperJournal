@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
               embedding,
               profile_snapshot: tradingProfile,
               token_count: Math.ceil(fullContent.length / 4),
-            });
+            } as any);
 
             // Update trading profile
             const updatedProfile = await updateTradingProfileFromSession(
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
               .update({
                 trading_profile: updatedProfile,
                 last_coaching_session: new Date().toISOString(),
-              })
+              } as any)
               .eq("id", user.id);
           } catch (err) {
             console.error("Failed to save coaching session:", err);

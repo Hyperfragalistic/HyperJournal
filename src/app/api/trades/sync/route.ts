@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     user_id: user.id,
     sync_status: "syncing",
     updated_at: new Date().toISOString(),
-  });
+  } as any);
 
   try {
     // Get last sync time
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         sync_status: "idle",
         last_synced: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      });
+      } as any);
       return NextResponse.json({ synced: 0, message: "No new trades" });
     }
 
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
         raw_data: fill.rawData,
         status: "closed",
         embedding,
-      });
+      } as any);
 
       if (!insertError) newCount++;
     }
@@ -120,12 +120,12 @@ export async function POST(req: NextRequest) {
       last_fill_time: maxFillTime,
       total_trades_synced: newCount,
       updated_at: new Date().toISOString(),
-    });
+    } as any);
 
     // Update profile hl_address if not set
     await supabase
       .from("profiles")
-      .update({ hl_address: address, hl_connected_at: new Date().toISOString() })
+      .update({ hl_address: address, hl_connected_at: new Date().toISOString() } as any)
       .eq("id", user.id);
 
     return NextResponse.json({
@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
       sync_status: "error",
       error_message: message,
       updated_at: new Date().toISOString(),
-    });
+    } as any);
 
     return NextResponse.json({ error: message }, { status: 500 });
   }

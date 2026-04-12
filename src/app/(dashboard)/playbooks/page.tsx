@@ -143,10 +143,10 @@ export default function PlaybooksPage() {
   const { mutate: savePlaybook } = useMutation({
     mutationFn: async (data: Partial<Playbook>) => {
       if (data.id) {
-        const { error } = await supabase.from("playbooks").update(data).eq("id", data.id);
+        const { error } = await supabase.from("playbooks").update(data as any).eq("id", data.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("playbooks").insert({ ...data, user_id: userId! });
+        const { error } = await supabase.from("playbooks").insert({ ...data, user_id: userId! } as any);
         if (error) throw error;
       }
     },

@@ -162,7 +162,7 @@ export function useUpdateTrade() {
     }) => {
       const { data, error } = await supabase
         .from("trades")
-        .update(updates)
+        .update(updates as any)
         .eq("id", id)
         .select()
         .single();
