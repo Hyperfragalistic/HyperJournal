@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .single();
 
-    const lastFillTime = syncState?.last_fill_time;
+    const lastFillTime = (syncState as any)?.last_fill_time;
 
     // Fetch fills from Hyperliquid
     const fills = await getUserFills(address, lastFillTime ?? undefined);
