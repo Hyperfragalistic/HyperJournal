@@ -129,8 +129,7 @@ export default function PlaybooksPage() {
   const { data: playbooks = [], isLoading } = useQuery({
     queryKey: ["playbooks", userId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("playbooks")
+      const { data, error } = await (supabase.from("playbooks") as any)
         .select("*")
         .eq("user_id", userId!)
         .order("created_at", { ascending: false });
@@ -159,7 +158,7 @@ export default function PlaybooksPage() {
 
   const { mutate: deletePlaybook } = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("playbooks").delete().eq("id", id);
+      const { error } = await (supabase.from("playbooks") as any).delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["playbooks"] }),

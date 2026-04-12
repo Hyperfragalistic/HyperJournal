@@ -17,8 +17,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserId(session?.user?.id ?? null);
 
       if (session?.user?.id) {
-        const { data } = await supabase
-          .from("profiles")
+        const { data } = await (supabase.from("profiles") as any)
           .select("*")
           .eq("id", session.user.id)
           .single();
@@ -35,8 +34,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserId(session?.user?.id ?? null);
 
       if (session?.user?.id) {
-        const { data } = await supabase
-          .from("profiles")
+        const { data } = await (supabase.from("profiles") as any)
           .select("*")
           .eq("id", session.user.id)
           .single();

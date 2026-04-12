@@ -33,8 +33,7 @@ export async function POST(req: NextRequest) {
 
   try {
     // Get last sync time
-    const { data: syncState } = await supabase
-      .from("sync_state")
+    const { data: syncState } = await (supabase.from("sync_state") as any)
       .select("last_fill_time")
       .eq("user_id", user.id)
       .single();
@@ -61,8 +60,7 @@ export async function POST(req: NextRequest) {
 
     for (const fill of normalized) {
       // Check for existing fill
-      const { data: existing } = await supabase
-        .from("trades")
+      const { data: existing } = await (supabase.from("trades") as any)
         .select("id")
         .eq("hl_fill_id", fill.hlFillId)
         .single();

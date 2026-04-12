@@ -27,8 +27,7 @@ export function useTrades(filters: TradeFilters = {}) {
     queryFn: async () => {
       if (!userId) return [];
 
-      let query = supabase
-        .from("trades")
+      let query = (supabase.from("trades") as any)
         .select("*")
         .eq("user_id", userId)
         .order("entry_time", { ascending: false });
@@ -56,8 +55,7 @@ export function useTrade(tradeId: string) {
   return useQuery({
     queryKey: ["trade", tradeId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("trades")
+      const { data, error } = await (supabase.from("trades") as any)
         .select("*")
         .eq("id", tradeId)
         .single();
@@ -84,8 +82,7 @@ export function useTradeStats(period: "7d" | "30d" | "90d" | "all" = "30d") {
         dateFrom = from.toISOString();
       }
 
-      let query = supabase
-        .from("trades")
+      let query = (supabase.from("trades") as any)
         .select("net_pnl, pnl, fees, direction, coin, entry_time, exit_time, size, leverage")
         .eq("user_id", userId)
         .eq("status", "closed");
@@ -206,8 +203,7 @@ export function useSyncState() {
     queryKey: ["sync-state", userId],
     queryFn: async (): Promise<SyncState | null> => {
       if (!userId) return null;
-      const response = await supabase
-        .from("sync_state")
+      const response = await (supabase.from("sync_state") as any)
         .select("*")
         .eq("user_id", userId)
         .single();

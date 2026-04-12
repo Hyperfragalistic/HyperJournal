@@ -39,8 +39,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Fetch user profile
-  const { data: profileData } = await supabase
-    .from("profiles")
+  const { data: profileData } = await (supabase.from("profiles") as any)
     .select("*")
     .eq("id", user.id)
     .single();
@@ -48,8 +47,7 @@ export async function POST(req: NextRequest) {
   const profile = profileData as unknown as Profile;
 
   // Fetch recent trades since last coaching session
-  let tradesQuery = supabase
-    .from("trades")
+  let tradesQuery = (supabase.from("trades") as any)
     .select("*")
     .eq("user_id", user.id)
     .eq("status", "closed")
