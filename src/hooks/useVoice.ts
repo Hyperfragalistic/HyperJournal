@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { splitIntoSentences } from "@/lib/utils";
+// Browser Speech API type stubs (not in all TS lib versions)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SpeechRecognition = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SpeechRecognitionEvent = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SpeechRecognitionErrorEvent = any;
 
 // ============================================================
 // BROWSER COMPATIBILITY TYPES
