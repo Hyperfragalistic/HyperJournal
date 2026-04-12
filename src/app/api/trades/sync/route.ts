@@ -32,13 +32,20 @@ export async function POST(req: NextRequest) {
   });
 
   try {
-    // Get last sync time
+    // Get last sync time and previously connected address
     const { data: syncState } = await (supabase.from("sync_state") as any)
       .select("last_fill_time")
       .eq("user_id", user.id)
       .single();
 
-    const lastFillTime = (syncState as any)?.last_fill_time;
+    const { data: profileData } = await (supabase.from("profiles") as any)
+      .select("hl_address")
+      .eq("id", user.id)
+      .single();
+
+    // If the address changed, reset last_fill_time so all fills are fetched from scratch
+    const addressChanged = profileData?.hl_address && profileData.hl_address !== address;
+    const lastFillTime = addressChanged ? null : (syncState as any)?.last_fill_time;
 
     // Fetch fills from Hyperliquid
     const fills = await getUserFills(address, lastFillTime ?? undefined);
