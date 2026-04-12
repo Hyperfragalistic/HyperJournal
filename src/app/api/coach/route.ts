@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
               psychological_insights: insights.psychological_insights,
               technical_insights: insights.technical_insights,
               recommendations: insights.recommendations,
-              trades_analyzed: (recentTrades ?? []).map((t) => t.id),
+              trades_analyzed: (recentTrades ?? []).map((t: any) => t.id),
               embedding,
               profile_snapshot: tradingProfile,
               token_count: Math.ceil(fullContent.length / 4),
@@ -202,5 +202,4 @@ export async function POST(req: NextRequest) {
       Connection: "keep-alive",
       "X-Accel-Buffering": "no",
     },
-  });
-}
+  }

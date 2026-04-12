@@ -95,7 +95,7 @@ export function useTradeStats(period: "7d" | "30d" | "90d" | "all" = "30d") {
       const { data, error } = await query;
       if (error) throw error;
 
-      const trades = data ?? [];
+      const trades = (data ?? []) as any[];
       if (trades.length === 0) return emptyStats();
 
       const wins = trades.filter((t) => (t.net_pnl ?? 0) > 0);
@@ -214,6 +214,4 @@ export function useSyncState() {
       return (response.data ?? null) as SyncState | null;
     },
     enabled: !!userId,
-    refetchInterval: 5000,
-  });
-}
+    refetchInterval: 500
