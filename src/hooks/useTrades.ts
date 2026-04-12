@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import type { Trade } from "@/lib/supabase/types";
+import type { Trade, SyncState } from "@/lib/supabase/types";
 import { useAppStore } from "@/stores/useAppStore";
 
 const supabase = createClient();
@@ -203,16 +203,16 @@ export function useSyncTrades() {
 export function useSyncState() {
   const userId = useAppStore((s) => s.userId);
 
-  return useQuery({
+  return useQuery<SyncState | null>({
     queryKey: ["sync-state", userId],
-    queryFn: async () => {
+    queryFn: async (): Promise<SyncState | null> => {
       if (!userId) return null;
-      const { data } = await supabase
+      const response = await supabase
         .from("sync_state")
         .select("*")
         .eq("user_id", userId)
         .single();
-      return data;
+      return (response.data ?? null) as SyncState | null;
     },
     enabled: !!userId,
     refetchInterval: 5000,
