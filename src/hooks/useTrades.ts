@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import type { Trade, SyncState } from "@/lib/supabase/types";
+import type { Trade, SyncState, Wallet } from "@/lib/supabase/types";
 import { useAppStore } from "@/stores/useAppStore";
 
 const supabase = createClient();
@@ -212,4 +212,77 @@ export function useSyncState() {
     enabled: !!userId,
     refetchInterval: 5000,
   });
+}
+
+export function useWallets() {
+  const userId = useAppStore((s) => s.userId);
+  const queryClient = useQueryClient();
+
+  const query = useQuery<Wallet[]>({
+    queryKey: ["wallets", userId],
+    queryFn: async (): Promise<Wallet[]> => {
+      if (!userId) return [];
+      const { data } = await (supabase.from("wallets") as any)
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      return (data ?? []) as Wallet[];
+    },
+    enabled: !!userId,
+    refetchInterval: 3000,
+  });
+
+  const { mutate: syncWallet, isPending: syncing, variables: syncingAddress } = useMutation({
+    mutationFn: async (address: string) => {
+      const res = await fetch("/api/trades/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address }),
+      });
+      if (!res.ok) {
+        const err = await res.json() as { error?: string };
+        throw new Error(err.error ?? "Sync failed");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wallets"] });
+      queryClient.invalidateQueries({ queryKey: ["trades"] });
+      queryClient.invalidateQueries({ queryKey: ["trade-stats"] });
+    },
+  });
+
+  const { mutate: removeWallet } = useMutation({
+    mutationFn: async (address: string) => {
+      const res = await fetch("/api/wallets/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address }),
+      });
+      if (!res.ok) throw new Error("Failed to remove wallet");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wallets"] });
+      queryClient.invalidateQueries({ queryKey: ["trades"] });
+      queryClient.invalidateQueries({ queryKey: ["trade-stats"] });
+    },
+  });
+
+  const { mutate: wipeWallet } = useMutation({
+    mutationFn: async (address?: string) => {
+      const res = await fetch("/api/wallets/wipe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address }),
+      });
+      if (!res.ok) throw new Error("Failed to wipe data");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wallets"] });
+      queryClient.invalidateQueries({ queryKey: ["trades"] });
+      queryClient.invalidateQueries({ queryKey: ["trade-stats"] });
+    },
+  });
+
+  return { ...query, syncWallet, syncing, syncingAddress, removeWallet, wipeWallet };
 }

@@ -474,3 +474,16 @@ export type CoachingSession = Database["public"]["Tables"]["coaching_sessions"][
 export type JournalEntry = Database["public"]["Tables"]["journal_entries"]["Row"];
 export type SyncState = Database["public"]["Tables"]["sync_state"]["Row"];
 export type DailyStat = Database["public"]["Tables"]["daily_stats"]["Row"];
+
+export type Wallet = {
+  id: string;
+  user_id: string;
+  address: string;
+  label: string | null;
+  last_fill_time: number | null;
+  last_synced: string | null;
+  sync_status: "idle" | "syncing" | "error";
+  error_message: string | null;
+  total_trades_synced: number;
+  created_at: string;
+};

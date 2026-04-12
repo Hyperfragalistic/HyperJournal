@@ -24,49 +24,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid Hyperliquid address" }, { status: 400 });
   }
 
-  // Update sync state to syncing
-  await (supabase.from("sync_state") as any).upsert({
+  // Upsert wallet row and mark as syncing
+  await (supabase.from("wallets") as any).upsert({
     user_id: user.id,
+    address,
     sync_status: "syncing",
-    updated_at: new Date().toISOString(),
-  });
+  }, { onConflict: "user_id,address" });
 
   try {
-    // Get last sync time and previously connected address
-    const { data: syncState } = await (supabase.from("sync_state") as any)
+    // Get this wallet's last fill time
+    const { data: walletData } = await (supabase.from("wallets") as any)
       .select("last_fill_time")
       .eq("user_id", user.id)
+      .eq("address", address)
       .single();
 
-    const { data: profileData } = await (supabase.from("profiles") as any)
-      .select("hl_address")
-      .eq("id", user.id)
-      .single();
-
-    // If the address changed, reset last_fill_time so all fills are fetched from scratch
-    const addressChanged = profileData?.hl_address && profileData.hl_address !== address;
-    const lastFillTime = addressChanged ? null : (syncState as any)?.last_fill_time;
+    const lastFillTime = (walletData as any)?.last_fill_time ?? null;
 
     // Fetch fills from Hyperliquid
     const fills = await getUserFills(address, lastFillTime ?? undefined);
 
     if (fills.length === 0) {
-      await (supabase.from("sync_state") as any).upsert({
+      await (supabase.from("wallets") as any).upsert({
         user_id: user.id,
+        address,
         sync_status: "idle",
         last_synced: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+      }, { onConflict: "user_id,address" });
       return NextResponse.json({ synced: 0, message: "No new trades" });
     }
 
-    // Process fills
     const normalized = normalizeFills(fills);
     let newCount = 0;
     let maxFillTime = lastFillTime ?? 0;
 
     for (const fill of normalized) {
-      // Check for existing fill
       const { data: existing } = await (supabase.from("trades") as any)
         .select("id")
         .eq("hl_fill_id", fill.hlFillId)
@@ -77,7 +69,6 @@ export async function POST(req: NextRequest) {
       const fillTime = fill.entryTime.getTime();
       if (fillTime > maxFillTime) maxFillTime = fillTime;
 
-      // Generate embedding for RAG
       let embedding: number[] | null = null;
       try {
         embedding = await generateTradeEmbedding({
@@ -96,6 +87,7 @@ export async function POST(req: NextRequest) {
 
       const { error: insertError } = await (supabase.from("trades") as any).insert({
         user_id: user.id,
+        wallet_address: address,
         hl_fill_id: fill.hlFillId,
         coin: fill.coin,
         direction: fill.direction,
@@ -117,17 +109,17 @@ export async function POST(req: NextRequest) {
       if (!insertError) newCount++;
     }
 
-    // Update sync state
-    await (supabase.from("sync_state") as any).upsert({
+    // Update wallet sync state
+    await (supabase.from("wallets") as any).upsert({
       user_id: user.id,
+      address,
       sync_status: "idle",
       last_synced: new Date().toISOString(),
       last_fill_time: maxFillTime,
       total_trades_synced: newCount,
-      updated_at: new Date().toISOString(),
-    });
+    }, { onConflict: "user_id,address" });
 
-    // Update profile hl_address if not set
+    // Keep profile hl_address in sync (most recently synced wallet)
     await (supabase.from("profiles") as any)
       .update({ hl_address: address, hl_connected_at: new Date().toISOString() })
       .eq("id", user.id);
@@ -140,12 +132,12 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "Sync failed";
 
-    await (supabase.from("sync_state") as any).upsert({
+    await (supabase.from("wallets") as any).upsert({
       user_id: user.id,
+      address,
       sync_status: "error",
       error_message: message,
-      updated_at: new Date().toISOString(),
-    });
+    }, { onConflict: "user_id,address" });
 
     return NextResponse.json({ error: message }, { status: 500 });
   }
