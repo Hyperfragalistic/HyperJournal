@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (matchedSessions && matchedSessions.length > 0) {
-      ragSessions = matchedSessions.map((s) => ({
+      ragSessions = matchedSessions.map((s: any) => ({
         session_summary: s.session_summary,
         psychological_insights: s.psychological_insights,
         recommendations: s.recommendations,
