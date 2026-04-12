@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     const lastUserMessage = messages[messages.length - 1].content;
     const queryEmbedding = await generateEmbedding(lastUserMessage);
 
-    const { data: matchedSessions } = await supabase.rpc("match_coaching_sessions", {
+    const { data: matchedSessions } = await (supabase as any).rpc("match_coaching_sessions", {
       query_embedding: queryEmbedding,
       match_user_id: user.id,
       match_threshold: 0.6,
