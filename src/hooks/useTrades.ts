@@ -214,4 +214,6 @@ export function useSyncState() {
       return (response.data ?? null) as SyncState | null;
     },
     enabled: !!userId,
-    refetchInterval: 500
+    refetchInterval: 5000,
+  });
+}

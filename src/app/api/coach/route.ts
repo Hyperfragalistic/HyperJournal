@@ -202,4 +202,5 @@ export async function POST(req: NextRequest) {
       Connection: "keep-alive",
       "X-Accel-Buffering": "no",
     },
-  }
+  });
+}
