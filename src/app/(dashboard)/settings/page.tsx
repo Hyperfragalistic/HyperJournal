@@ -81,9 +81,8 @@ export default function SettingsPage() {
       preferred_voice_uri: selectedVoiceURI || null,
     };
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .update(updates as any)
+    const { data, error } = await (supabase.from("profiles") as any)
+      .update(updates)
       .eq("id", profile!.id)
       .select()
       .single();

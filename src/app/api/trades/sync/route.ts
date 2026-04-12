@@ -25,11 +25,11 @@ export async function POST(req: NextRequest) {
   }
 
   // Update sync state to syncing
-  await supabase.from("sync_state").upsert({
+  await (supabase.from("sync_state") as any).upsert({
     user_id: user.id,
     sync_status: "syncing",
     updated_at: new Date().toISOString(),
-  } as any);
+  });
 
   try {
     // Get last sync time
@@ -45,12 +45,12 @@ export async function POST(req: NextRequest) {
     const fills = await getUserFills(address, lastFillTime ?? undefined);
 
     if (fills.length === 0) {
-      await supabase.from("sync_state").upsert({
+      await (supabase.from("sync_state") as any).upsert({
         user_id: user.id,
         sync_status: "idle",
         last_synced: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      } as any);
+      });
       return NextResponse.json({ synced: 0, message: "No new trades" });
     }
 
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         // Continue without embedding
       }
 
-      const { error: insertError } = await supabase.from("trades").insert({
+      const { error: insertError } = await (supabase.from("trades") as any).insert({
         user_id: user.id,
         hl_fill_id: fill.hlFillId,
         coin: fill.coin,
@@ -107,25 +107,24 @@ export async function POST(req: NextRequest) {
         raw_data: fill.rawData,
         status: "closed",
         embedding,
-      } as any);
+      });
 
       if (!insertError) newCount++;
     }
 
     // Update sync state
-    await supabase.from("sync_state").upsert({
+    await (supabase.from("sync_state") as any).upsert({
       user_id: user.id,
       sync_status: "idle",
       last_synced: new Date().toISOString(),
       last_fill_time: maxFillTime,
       total_trades_synced: newCount,
       updated_at: new Date().toISOString(),
-    } as any);
+    });
 
     // Update profile hl_address if not set
-    await supabase
-      .from("profiles")
-      .update({ hl_address: address, hl_connected_at: new Date().toISOString() } as any)
+    await (supabase.from("profiles") as any)
+      .update({ hl_address: address, hl_connected_at: new Date().toISOString() })
       .eq("id", user.id);
 
     return NextResponse.json({
@@ -136,12 +135,12 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "Sync failed";
 
-    await supabase.from("sync_state").upsert({
+    await (supabase.from("sync_state") as any).upsert({
       user_id: user.id,
       sync_status: "error",
       error_message: message,
       updated_at: new Date().toISOString(),
-    } as any);
+    });
 
     return NextResponse.json({ error: message }, { status: 500 });
   }

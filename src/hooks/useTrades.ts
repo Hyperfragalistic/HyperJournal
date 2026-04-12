@@ -160,9 +160,8 @@ export function useUpdateTrade() {
       id: string;
       updates: Partial<Trade>;
     }) => {
-      const { data, error } = await supabase
-        .from("trades")
-        .update(updates as any)
+      const { data, error } = await (supabase.from("trades") as any)
+        .update(updates)
         .eq("id", id)
         .select()
         .single();
