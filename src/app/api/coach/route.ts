@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
   // Merge past sessions with RAG results (deduplicated)
   const allContext = [
     ...(pastSessions ?? []),
-    ...ragSessions.filter(
+    ...(ragSessions ?? []).filter(
       (r) =>
         !(pastSessions ?? []).some((p) => p.created_at === r.created_at)
     ),
