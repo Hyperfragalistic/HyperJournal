@@ -1,0 +1,8 @@
+# Extends the gitleaks v8 default rules. Do not disable rules here.
+# Suppress a hit only when it is a clear false positive, and only by exact
+# fingerprint in .gitleaksignore. A path allowlist is reserved for one named
+# vendored minified bundle or one named fixture file — never a directory.
+title = "HyperJournal"
+
+[extend]
+useDefault = true
