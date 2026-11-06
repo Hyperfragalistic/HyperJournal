@@ -41,3 +41,18 @@ public/worker-*.js
 public/sw.js.map
 public/workbox-*.js.map
 public/worker-*.js.map
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+# Tracked placeholder. `.env.*` would ignore it; keep it in the repo.
+!.env.local.example
+*.pem
+*.key
+*.p12
+credentials*.json
+*service-account*.json
+*serviceaccount*.json
+.npmrc
+.pypirc
